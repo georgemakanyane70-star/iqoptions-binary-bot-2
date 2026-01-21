@@ -1,0 +1,7 @@
+config.py
+EMAIL = "your_email_here"
+PASSWORD = "your_password_here"
+
+PAIR = "EURUSD"
+AMOUNT = 1
+DURATION = 1
