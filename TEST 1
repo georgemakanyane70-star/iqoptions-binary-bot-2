@@ -1,0 +1,57 @@
+
+Now **paste this code** into the big text box:
+
+```python
+from iqoptionapi.stable_api import IQ_Option
+import time
+import config
+
+# Connect to IQ Option
+iq = IQ_Option(config.EMAIL, config.PASSWORD)
+iq.connect()
+
+if not iq.check_connect():
+    print("Connection failed")
+    exit()
+else:
+    print("Connected to IQ Option")
+
+# Use demo account
+iq.change_balance("PRACTICE")
+
+PAIR = config.PAIR
+AMOUNT = config.AMOUNT
+DURATION = config.DURATION
+
+def get_signal():
+    candles = iq.get_candles(PAIR, 60, 2, time.time())
+    last = candles[-1]
+
+    if last['close'] > last['open']:
+        return "call"
+    else:
+        return "put"
+
+while True:
+    signal = get_signal()
+    print("Signal:", signal)
+
+    check, trade_id = iq.buy(
+        AMOUNT,
+        PAIR,
+        signal,
+        DURATION
+    )
+
+    if check:
+        print("Trade opened")
+        while True:
+            result = iq.check_win_v4(trade_id)
+            if result is not None:
+                print("Result:", result)
+                break
+            time.sleep(1)
+    else:
+        print("Trade failed")
+
+    time.sleep(60)
